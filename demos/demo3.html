@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>demo</title>
+		<meta charset="utf-8" />
+		<meta
+			name="viewport"
+			content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"
+		/>
+		<link type="text/css" rel="stylesheet" href="/examples/main.css" />
+		<style>
+			a {
+				color: blue;
+			}
+			.control-inactive button {
+				color: #888;
+			}
+			#control {
+				position: absolute;
+				top: 10px;
+				right: 10px;
+				z-index: 100;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="container"></div>
+		<button id="control">开始</button>
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script
+			async
+			src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"
+		></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "/examples/jsm/"
+				}
+			}
+		</script>
+
+		<script type="module">
+			import * as THREE from "three";
+
+			import Stats from "three/addons/libs/stats.module.js";
+			import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+
+			let scene, renderer, camera, stats, clock;
+			let controls, mesh, group, spriteGroup;
+			let speed = 0.2;
+
+			const headImgArr = [
+				"https://thirdwx.qlogo.cn/mmopen/vi_32/Q3auHgzwzM44ytXgSvxvARWgAlzVGx7EPXWtCfCXnqXFhial7AnuhOuXY5bdpyOQXQPmmiaAFjJmKllZ6goE7MFQ/132",
+				"https://thirdwx.qlogo.cn/mmopen/vi_32/Q3auHgzwzM6QianmTcO2EVxv63I7Su3TFV8Gh25aoT7656ibm2fophC9eRlEtopC0j4T85hrp9nlbA6Ko43Y5FhA/132",
+				"https://thirdwx.qlogo.cn/mmopen/vi_32/INc61dATFSib3pwFNHJbfYvNlBW4rdm0j8ibpNQQ2dZVcIA94tnX78YsGqrJkicus7HJxAmIxsgBMFMNiaGzaiasKVw/132",
+				"https://thirdwx.qlogo.cn/mmopen/vi_32/rh2vpwiage7g3NBZ1Zk8tvrDclww1XDMmEGibCoTF29LChqI58TT4F0VXJKEVsJnH09h0XOTnyjEiaKzK95dbuZwg/132",
+				"https://thirdwx.qlogo.cn/mmopen/vi_32/DYAIOgq83er91ib1lzkI4jNHdvPRpI1WChYPsKjskrGcw1WDwhcuBGx1vrqBIOQp4HQjwBNPpT0ZjsvhIrUZJEQ/132",
+				"https://thirdwx.qlogo.cn/mmopen/vi_32/Q0j4TwGTfTIHCeNvUeZJ6gce2lw7gMev7boDW3g9XaEnNloJ7kL5QJCNor7lVdVnicyQPnF6AVQbIyDqibqzfvKg/132",
+				"https://thirdwx.qlogo.cn/mmopen/vi_32/BwSsFfuEEc8fvbymqibxqyEtHoEsDYIiaaC6aIW4wD0d9ccFZMsRMianXJWpMyricO3U8mVYkrrPOJ5F035ukbFBgw/132",
+				"https://thirdwx.qlogo.cn/mmopen/vi_32/DYAIOgq83eoeeHYkJBPlqtAA69yfQcG4hL8E9hlMfIM7fmaZ5ic9Ykg41LPf1icsyp1xYpG4IlfCsFQ8Xichwbmyg/132",
+				"https://thirdwx.qlogo.cn/mmopen/vi_32/23NYpUJpCwn9Eibz3ZuIgtia3icGk7libicd6ialyrZgJE5umibniaYdHpCicXz4tW33tnkAo8N5EWq8eDYI3iaTFxzTo63Q/132",
+				"https://thirdwx.qlogo.cn/mmopen/vi_32/sPQpHVjARcHUYzMbgMIQuOl6ibHweCBbankFqib8CCUPZnLmAdf2ZIfPUibQjLWuicr7wu5LBlb9yGUaPGBBZmBSbg/132",
+				"https://thirdwx.qlogo.cn/mmopen/vi_32/DFWAg2X0Ec2el6KDeJg3h3Pwyc5r1GUexTJ10uvichDIYE9OyiaoSvOyGfsNP8XIxeKfIElUiaEUoptjxRBmLSpwQ/132",
+				"https://thirdwx.qlogo.cn/mmopen/vi_32/GPYia9SpuXQSug9FUmMMGIT8WlFFN6usgFGiaWwicnzcWd9EsgUOKLnaibbg46dmgxppjzJIjXrYlgGevxmEA41BrQ/132",
+				"https://thirdwx.qlogo.cn/mmopen/vi_32/Q0j4TwGTfTID9qicd2rbDhyJoALSwvjOTu26vVCTGJQzNla9vFa5sX75icbyWkMYAGZiam7OYqwCYqg0rCXGPVyHQ/132",
+				"https://thirdwx.qlogo.cn/mmopen/vi_32/Q3auHgzwzM7oa1gCQVwRegNicbNUoQHnQz06kmvmNL1NFnLujBtzbnQ3GZF7bYib8Zg6Xg376CavWVYowFN4Dy7A/132",
+				"https://thirdwx.qlogo.cn/mmopen/vi_32/Q3auHgzwzM5wYTXc11nAtkn1fwRdUxphhEwlAVdM5jtpLNoqAXIWftJibnooqXadB7cCzTBNu35Ry3ccF4ypxSg/132",
+				"https://thirdwx.qlogo.cn/mmopen/vi_32/Q3auHgzwzM7Af1GyPyF7t6Bw6hzGmibLxTCR6aibJZqq9BwicYic8bIHWyKoD928QEfHbpibTIeQiaouecEEgrFEZPAQ/132",
+			];
+
+			init();
+			animate();
+
+			function init() {
+				clock = new THREE.Clock();
+				const container = document.getElementById("container");
+
+				stats = new Stats();
+				container.appendChild(stats.dom);
+
+				// renderer
+				renderer = new THREE.WebGLRenderer({ antialias: true });
+				renderer.setPixelRatio(window.devicePixelRatio);
+				renderer.setSize(window.innerWidth, window.innerHeight);
+				container.appendChild(renderer.domElement);
+
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color(0x000000);
+				scene.fog = new THREE.Fog(0xa0a0a0, 300, 900);
+				scene.add(new THREE.AxesHelper(300));
+
+				// camera
+				camera = new THREE.PerspectiveCamera(
+					40,
+					window.innerWidth / window.innerHeight,
+					1,
+					2000
+				);
+				camera.position.set(150, 170, 400);
+				window.camera = camera;
+
+				// controls
+				controls = new OrbitControls(camera, renderer.domElement);
+				controls.target.set(0, 1, 0);
+				controls.update();
+				controls.enablePan = true;
+				controls.enableZoom = true;
+				controls.enableDamping = true;
+
+				const textureLoader = new THREE.TextureLoader();
+
+				group = new THREE.Group();
+				spriteGroup = new THREE.Group();
+
+				// 设置精灵对象
+				// sphere
+				const vector = new THREE.Vector3();
+				for (let i = 0, l = 300; i < l; i++) {
+					const phi = Math.acos(-1 + (2 * i) / l);
+					const theta = Math.sqrt(l * Math.PI) * phi;
+
+					const object = new THREE.Object3D();
+
+					object.position.setFromSphericalCoords(150, phi, theta);
+
+					vector.copy(object.position).multiplyScalar(2);
+
+					object.lookAt(vector);
+
+					////////////////////////////////////////
+					// 文字
+					let ctx,
+						textTexture,
+						fontSize = 12,
+						canvas = document.createElement("canvas");
+					ctx = canvas.getContext("2d");
+					ctx.font = fontSize + "px Arial";
+					canvas.width = ctx.measureText(i).width;
+					canvas.height = fontSize * 2;
+					ctx.font = fontSize + "px Arial";
+					ctx.fillStyle = "rgba(255,255,255,1)";
+					ctx.fillText(i, 0, fontSize);
+					textTexture = new THREE.Texture(canvas);
+					textTexture.minFilter = THREE.LinearFilter;
+					textTexture.needsUpdate = true;
+
+					const imgTexture = textureLoader.load(
+						headImgArr[(Math.random() * headImgArr.length) | 0]
+					);
+
+					const material = new THREE.SpriteMaterial({
+						map: Math.random() > 0.5 ? textTexture : imgTexture,
+					});
+					const sprite = new THREE.Sprite(material);
+					sprite.position.copy(object.position);
+					sprite.scale.set(10, 10, 1);
+
+					spriteGroup.add(sprite);
+				}
+				group.add(spriteGroup);
+				scene.add(group);
+
+				group.rotation.z = -Math.PI / 5;
+			}
+
+			window.onresize = function onWindowResize() {
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+				renderer.setSize(window.innerWidth, window.innerHeight);
+			};
+
+			function animate() {
+				requestAnimationFrame(animate);
+
+				const time = Date.now() * 0.001 * speed;
+				spriteGroup.rotation.y = time;
+
+				controls.update();
+				stats.update();
+				renderer.render(scene, camera);
+			}
+
+			document.querySelector("#control").addEventListener("click", (e) => {
+				const v = e.target.innerText;
+				if (v === "开始") {
+					e.target.innerText = "暂停";
+					speed = 5;
+					group.rotation.z = Math.PI / 5;
+				} else {
+					e.target.innerText = "开始";
+					speed = 0.2;
+					group.rotation.z = -Math.PI / 5;
+				}
+			});
+		</script>
+	</body>
+</html>
