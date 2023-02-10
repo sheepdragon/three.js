@@ -94,19 +94,21 @@
 				light.position.set(50, 50, -10);
 				light.angle = Math.PI * 0.2;
 				light.castShadow = true;
-				scene.add(light);
+				// scene.add(light);
 
 				// 验证glb模型
 				const textureLoader = new THREE.TextureLoader();
 				const loader = new GLTFLoader();
 				loader.load(
-					"./untitled.glb",
+					"./untitled1.glb",
 					function (gltf) {
 						console.log(gltf);
 						scene.add(gltf.scene);
 						gltf.scene.scale.set(5, 5, 5);
 						gltf.scene.children[0].material.map = textureLoader.load(
-							"./uv_grid_directx.jpg"
+							// "./head.jpg",
+							'./texture-atlas.jpg',
+							// "./uv_grid_directx.jpg"
 						);
 					},
 					function (xhr) {
