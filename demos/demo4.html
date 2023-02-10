@@ -46,6 +46,7 @@
 			let scene, renderer, camera, stats, clock;
 			let controls, mesh;
 
+			const twoPi = Math.PI * 2;
 			const aspect = window.innerWidth / window.innerHeight;
 
 			init();
@@ -62,12 +63,11 @@
 				renderer = new THREE.WebGLRenderer({ antialias: true });
 				renderer.setPixelRatio(window.devicePixelRatio);
 				renderer.setSize(window.innerWidth, window.innerHeight);
-				// renderer.outputEncoding = THREE.sRGBEncoding;
 				renderer.shadowMap.enabled = true;
 				container.appendChild(renderer.domElement);
 
 				scene = new THREE.Scene();
-				scene.background = new THREE.Color(0xf0f0f0);
+				scene.background = new THREE.Color(0x444444);
 				// scene.fog = new THREE.Fog(0xa0a0a0, 10, 50);
 				scene.add(new THREE.AxesHelper(30));
 
@@ -85,89 +85,44 @@
 				controls.enableDamping = true;
 
 				// 光源
-				const hemiLight = new THREE.HemisphereLight(0xffffff, 0x444444);
-				hemiLight.position.set(0, 50, 0);
-				scene.add(hemiLight);
-				scene.add(new THREE.HemisphereLightHelper(hemiLight, 5));
+				const lights = [];
+				lights[0] = new THREE.PointLight(0xffffff, 1, 0);
+				lights[1] = new THREE.PointLight(0xffffff, 1, 0);
+				lights[2] = new THREE.PointLight(0xffffff, 1, 0);
+				lights[0].position.set(0, 200, 0);
+				lights[1].position.set(100, 200, 100);
+				lights[2].position.set(-100, -200, -100);
+				scene.add(lights[0]);
+				scene.add(lights[1]);
+				scene.add(lights[2]);
 
-				const light = new THREE.SpotLight(0xffffff, 1.5);
-				light.position.set(50, 50, -10);
-				light.angle = Math.PI * 0.2;
-				light.castShadow = true;
-				scene.add(light);
-				scene.add(new THREE.SpotLightHelper(light));
-
-				// ground
-				const groundMesh = new THREE.Mesh(
-					new THREE.PlaneGeometry(200, 200),
-					new THREE.ShadowMaterial({ color: 0x000000, opacity: 0.2 })
-				);
-				groundMesh.rotation.x = -Math.PI / 2;
-				groundMesh.receiveShadow = true;
-				scene.add(groundMesh);
-
-				const helper = new THREE.GridHelper(200, 50);
-				helper.position.y = -0;
-				helper.material.opacity = 0.5;
-				helper.material.transparent = true;
-				scene.add(helper);
-
-				// box
-				const loader = new THREE.TextureLoader();
-
-				const boxGeometry = new THREE.BoxGeometry(10, 10, 10);
-				const dodecahedronGeometry = new THREE.DodecahedronGeometry(10, 0);
-
-				const geometry = boxGeometry;
+				//
+				const group = new THREE.Group();
+				const geometry = new THREE.ConeGeometry(5, 10, 3, 1, false, 0, twoPi);
 				const material = new THREE.MeshPhongMaterial({
-					map: loader.load("./texture-atlas.jpg"),
+					color: 0x156289,
+					emissive: 0x072534,
+					side: THREE.DoubleSide,
+					flatShading: true,
 				});
-				window.t = { geometry, material };
+				group.add(new THREE.Mesh(geometry, material))
 
-				mesh = new THREE.Mesh(geometry, material);
-				mesh.position.y = 5;
-				mesh.castShadow = true;
-				scene.add(mesh);
+				const lineMaterial = new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.5 });
+				group.add(new THREE.LineSegments(geometry, lineMaterial))
 
-				const uvAttribute = geometry.getAttribute("uv");
-				for (let i = 0; i < uvAttribute.count; i++) {
-					const x = uvAttribute.getX(i);
-					const y = uvAttribute.getY(i);
-					console.log("==", i, x, y);
-					// uvAttribute.setXY(i, x/2, y/3)
-				}
+				group.position.y = 5;
+				scene.add(group);
 
-				// 24 / 4 = 6
-				// z 字型顺序
-				uvAttribute.setXY(0, 0, 1 / 3);
-				uvAttribute.setXY(1, 1 / 2, 1 / 3);
-				uvAttribute.setXY(2, 0, 0);
-				uvAttribute.setXY(3, 1 / 2, 0);
+				window.geometry = geometry
 
-				uvAttribute.setXY(4, 1 / 2, 1 / 3);
-				uvAttribute.setXY(5, 1, 1 / 3);
-				uvAttribute.setXY(6, 1 / 2, 0);
-				uvAttribute.setXY(7, 1, 0);
+				const points = [];
+				points.push( new THREE.Vector3( 13, 0, 0 ) );
+				points.push( new THREE.Vector3( 13, 13, 0 ) );
+				const line = new THREE.Line( new THREE.BufferGeometry().setFromPoints( points ), new THREE.LineBasicMaterial({color: 0x0c0c0c}) );
+				scene.add( line );
+				window.line = line
 
-				uvAttribute.setXY(8, 0, 2 / 3);
-				uvAttribute.setXY(9, 1 / 2, 2 / 3);
-				uvAttribute.setXY(10, 0, 1 / 3);
-				uvAttribute.setXY(11, 1 / 2, 1 / 3);
-
-				uvAttribute.setXY(12, 1 / 2, 2 / 3);
-				uvAttribute.setXY(13, 1, 2 / 3);
-				uvAttribute.setXY(14, 1 / 2, 1 / 3);
-				uvAttribute.setXY(15, 1, 1 / 3);
-
-				uvAttribute.setXY(16, 0, 1);
-				uvAttribute.setXY(17, 1 / 2, 1);
-				uvAttribute.setXY(18, 0, 2 / 3);
-				uvAttribute.setXY(19, 1 / 2, 2 / 3);
-
-				uvAttribute.setXY(20, 1 / 2, 1);
-				uvAttribute.setXY(21, 1, 1);
-				uvAttribute.setXY(22, 1 / 2, 2 / 3);
-				uvAttribute.setXY(23, 1, 2 / 3);
+				window.scene = scene
 			}
 
 			window.onresize = function onWindowResize() {

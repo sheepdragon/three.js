@@ -52,23 +52,22 @@
 			let controls, mesh, group, spriteGroup;
 			let speed = 0.2;
 
+			const aspect = window.innerWidth / window.innerHeight;
+
 			const headImgArr = [
-				"https://thirdwx.qlogo.cn/mmopen/vi_32/Q3auHgzwzM44ytXgSvxvARWgAlzVGx7EPXWtCfCXnqXFhial7AnuhOuXY5bdpyOQXQPmmiaAFjJmKllZ6goE7MFQ/132",
-				"https://thirdwx.qlogo.cn/mmopen/vi_32/Q3auHgzwzM6QianmTcO2EVxv63I7Su3TFV8Gh25aoT7656ibm2fophC9eRlEtopC0j4T85hrp9nlbA6Ko43Y5FhA/132",
-				"https://thirdwx.qlogo.cn/mmopen/vi_32/INc61dATFSib3pwFNHJbfYvNlBW4rdm0j8ibpNQQ2dZVcIA94tnX78YsGqrJkicus7HJxAmIxsgBMFMNiaGzaiasKVw/132",
-				"https://thirdwx.qlogo.cn/mmopen/vi_32/rh2vpwiage7g3NBZ1Zk8tvrDclww1XDMmEGibCoTF29LChqI58TT4F0VXJKEVsJnH09h0XOTnyjEiaKzK95dbuZwg/132",
-				"https://thirdwx.qlogo.cn/mmopen/vi_32/DYAIOgq83er91ib1lzkI4jNHdvPRpI1WChYPsKjskrGcw1WDwhcuBGx1vrqBIOQp4HQjwBNPpT0ZjsvhIrUZJEQ/132",
-				"https://thirdwx.qlogo.cn/mmopen/vi_32/Q0j4TwGTfTIHCeNvUeZJ6gce2lw7gMev7boDW3g9XaEnNloJ7kL5QJCNor7lVdVnicyQPnF6AVQbIyDqibqzfvKg/132",
-				"https://thirdwx.qlogo.cn/mmopen/vi_32/BwSsFfuEEc8fvbymqibxqyEtHoEsDYIiaaC6aIW4wD0d9ccFZMsRMianXJWpMyricO3U8mVYkrrPOJ5F035ukbFBgw/132",
-				"https://thirdwx.qlogo.cn/mmopen/vi_32/DYAIOgq83eoeeHYkJBPlqtAA69yfQcG4hL8E9hlMfIM7fmaZ5ic9Ykg41LPf1icsyp1xYpG4IlfCsFQ8Xichwbmyg/132",
-				"https://thirdwx.qlogo.cn/mmopen/vi_32/23NYpUJpCwn9Eibz3ZuIgtia3icGk7libicd6ialyrZgJE5umibniaYdHpCicXz4tW33tnkAo8N5EWq8eDYI3iaTFxzTo63Q/132",
-				"https://thirdwx.qlogo.cn/mmopen/vi_32/sPQpHVjARcHUYzMbgMIQuOl6ibHweCBbankFqib8CCUPZnLmAdf2ZIfPUibQjLWuicr7wu5LBlb9yGUaPGBBZmBSbg/132",
-				"https://thirdwx.qlogo.cn/mmopen/vi_32/DFWAg2X0Ec2el6KDeJg3h3Pwyc5r1GUexTJ10uvichDIYE9OyiaoSvOyGfsNP8XIxeKfIElUiaEUoptjxRBmLSpwQ/132",
-				"https://thirdwx.qlogo.cn/mmopen/vi_32/GPYia9SpuXQSug9FUmMMGIT8WlFFN6usgFGiaWwicnzcWd9EsgUOKLnaibbg46dmgxppjzJIjXrYlgGevxmEA41BrQ/132",
-				"https://thirdwx.qlogo.cn/mmopen/vi_32/Q0j4TwGTfTID9qicd2rbDhyJoALSwvjOTu26vVCTGJQzNla9vFa5sX75icbyWkMYAGZiam7OYqwCYqg0rCXGPVyHQ/132",
-				"https://thirdwx.qlogo.cn/mmopen/vi_32/Q3auHgzwzM7oa1gCQVwRegNicbNUoQHnQz06kmvmNL1NFnLujBtzbnQ3GZF7bYib8Zg6Xg376CavWVYowFN4Dy7A/132",
-				"https://thirdwx.qlogo.cn/mmopen/vi_32/Q3auHgzwzM5wYTXc11nAtkn1fwRdUxphhEwlAVdM5jtpLNoqAXIWftJibnooqXadB7cCzTBNu35Ry3ccF4ypxSg/132",
-				"https://thirdwx.qlogo.cn/mmopen/vi_32/Q3auHgzwzM7Af1GyPyF7t6Bw6hzGmibLxTCR6aibJZqq9BwicYic8bIHWyKoD928QEfHbpibTIeQiaouecEEgrFEZPAQ/132",
+				"./heads/1.png",
+				"./heads/2.png",
+				"./heads/3.png",
+				"./heads/4.png",
+				"./heads/5.png",
+				"./heads/6.png",
+				"./heads/7.png",
+				"./heads/8.png",
+				"./heads/9.png",
+				"./heads/10.png",
+				"./heads/11.png",
+				"./heads/12.png",
+				"./heads/13.png",
 			];
 
 			init();
@@ -93,12 +92,7 @@
 				scene.add(new THREE.AxesHelper(300));
 
 				// camera
-				camera = new THREE.PerspectiveCamera(
-					40,
-					window.innerWidth / window.innerHeight,
-					1,
-					2000
-				);
+				camera = new THREE.PerspectiveCamera(40, aspect, 1, 2000);
 				camera.position.set(150, 170, 400);
 				window.camera = camera;
 
@@ -121,39 +115,60 @@
 				for (let i = 0, l = 300; i < l; i++) {
 					const phi = Math.acos(-1 + (2 * i) / l);
 					const theta = Math.sqrt(l * Math.PI) * phi;
-
 					const object = new THREE.Object3D();
-
 					object.position.setFromSphericalCoords(150, phi, theta);
-
 					vector.copy(object.position).multiplyScalar(2);
-
 					object.lookAt(vector);
-
 					////////////////////////////////////////
-					// 文字
-					let ctx,
-						textTexture,
-						fontSize = 12,
-						canvas = document.createElement("canvas");
-					ctx = canvas.getContext("2d");
-					ctx.font = fontSize + "px Arial";
-					canvas.width = ctx.measureText(i).width;
-					canvas.height = fontSize * 2;
-					ctx.font = fontSize + "px Arial";
-					ctx.fillStyle = "rgba(255,255,255,1)";
-					ctx.fillText(i, 0, fontSize);
-					textTexture = new THREE.Texture(canvas);
-					textTexture.minFilter = THREE.LinearFilter;
-					textTexture.needsUpdate = true;
+					const imgUrl = headImgArr[(Math.random() * headImgArr.length) | 0];
 
-					const imgTexture = textureLoader.load(
-						headImgArr[(Math.random() * headImgArr.length) | 0]
-					);
+					let texture
+					const textureType = 'circle' // text, img, circle
+					switch (textureType) {
+						case 'text':
+							// 文字
+							let fontSize = 12;
+							let canvas = document.createElement("canvas");
+							let ctx = canvas.getContext("2d");
+							ctx.font = fontSize + "px Arial";
+							canvas.width = ctx.measureText(i).width;
+							canvas.height = fontSize * 2;
+							ctx.font = fontSize + "px Arial";
+							ctx.fillStyle = "rgba(255,255,255,1)";
+							ctx.fillText(i, 0, fontSize);
 
-					const material = new THREE.SpriteMaterial({
-						map: Math.random() > 0.5 ? textTexture : imgTexture,
-					});
+							texture = new THREE.Texture(canvas);
+							texture.minFilter = THREE.LinearFilter;
+							texture.needsUpdate = true;
+							break;
+						case 'circle':
+							// 图片加载
+							const img = document.createElement("img");
+							img.src = imgUrl;
+							img.onload = function () {
+								const { width, height } = img;
+								const canvas = document.createElement("canvas");
+								canvas.width = width;
+								canvas.height = height;
+								const ctx = canvas.getContext("2d");
+								ctx.save();
+								ctx.beginPath();
+								ctx.arc(width / 2, height / 2, width / 2, 0, Math.PI * 2, false);
+								ctx.clip();
+								ctx.drawImage(img, 0, 0, width, height);
+								ctx.restore();
+
+								texture = new THREE.CanvasTexture(canvas);
+								material.map = texture;
+								material.needsUpdate = true;
+							};
+							break;
+						default:
+							texture = textureLoader.load(imgUrl);
+							break;
+					}
+
+					const material = new THREE.SpriteMaterial({map: texture});
 					const sprite = new THREE.Sprite(material);
 					sprite.position.copy(object.position);
 					sprite.scale.set(10, 10, 1);
