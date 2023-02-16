@@ -1,162 +1,158 @@
 <!DOCTYPE html>
 <html lang="en">
-	<head>
-		<title>demo1</title>
-		<meta charset="utf-8" />
-		<meta
-			name="viewport"
-			content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"
-		/>
-		<link type="text/css" rel="stylesheet" href="/examples/main.css" />
-		<style>
-			body {
-				background-color: #ccc;
-				color: #000;
-			}
 
-			a {
-				color: #f00;
-			}
-		</style>
-	</head>
+<head>
+  <title>demo1</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
+  <link type="text/css" rel="stylesheet" href="/examples/main.css" />
+  <style>
+    body {
+      background-color: #ccc;
+      color: #000;
+    }
 
-	<body>
-		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a>
-			- orbit controls
-		</div>
+    a {
+      color: #f00;
+    }
+  </style>
+</head>
 
-		<!-- Import maps polyfill -->
-		<!-- Remove this when import maps will be widely supported -->
-		<script
-			async
-			src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"
-		></script>
+<body>
+  <div id="info">
+    <a href="https://threejs.org" target="_blank" rel="noopener">three.js</a>
+    - orbit controls
+  </div>
 
-		<script type="importmap">
-			{
-				"imports": {
-					"three": "../build/three.module.js",
-					"three/addons/": "/examples/jsm/"
-				}
-			}
-		</script>
+  <!-- Import maps polyfill -->
+  <!-- Remove this when import maps will be widely supported -->
+  <script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
 
-		<script type="module">
-			import * as THREE from "three";
+  <script type="importmap">
+      {
+        "imports": {
+          "three": "../build/three.module.js",
+          "three/addons/": "/examples/jsm/"
+        }
+      }
+    </script>
 
-			let camera, scene, renderer, mesh;
+  <script type="module">
+    import * as THREE from "three";
 
-			const aspect = window.innerWidth / window.innerHeight;
+    let camera, scene, renderer, mesh;
 
-			init();
-			animate();
+    const aspect = window.innerWidth / window.innerHeight;
 
-			function init() {
-				scene = new THREE.Scene();
-				camera = new THREE.PerspectiveCamera(70, aspect, 1, 1000);
+    init();
+    animate();
 
-				var light = new THREE.DirectionalLight(0xffffff);
-				light.position.set(0, 1, 1).normalize();
-				scene.add(light);
+    function init() {
+      scene = new THREE.Scene();
+      camera = new THREE.PerspectiveCamera(70, aspect, 1, 1000);
 
-				var geometry = new THREE.BoxGeometry(10, 10, 10);
+      var light = new THREE.DirectionalLight(0xffffff);
+      light.position.set(0, 1, 1).normalize();
+      scene.add(light);
 
-				const loader = new THREE.TextureLoader();
+      var geometry = new THREE.BoxGeometry(10, 10, 10);
 
-				var material = new THREE.MeshPhongMaterial({
-					map: loader.load("./texture-atlas.jpg"),
-				});
+      const loader = new THREE.TextureLoader();
 
-				var bricks = [
-					new THREE.Vector2(0, 0.666),
-					new THREE.Vector2(0.5, 0.666),
-					new THREE.Vector2(0.5, 1),
-					new THREE.Vector2(0, 1),
-				];
-				var clouds = [
-					new THREE.Vector2(0.5, 0.666),
-					new THREE.Vector2(1, 0.666),
-					new THREE.Vector2(1, 1),
-					new THREE.Vector2(0.5, 1),
-				];
-				var crate = [
-					new THREE.Vector2(0, 0.333),
-					new THREE.Vector2(0.5, 0.333),
-					new THREE.Vector2(0.5, 0.666),
-					new THREE.Vector2(0, 0.666),
-				];
-				var stone = [
-					new THREE.Vector2(0.5, 0.333),
-					new THREE.Vector2(1, 0.333),
-					new THREE.Vector2(1, 0.666),
-					new THREE.Vector2(0.5, 0.666),
-				];
-				var water = [
-					new THREE.Vector2(0, 0),
-					new THREE.Vector2(0.5, 0),
-					new THREE.Vector2(0.5, 0.333),
-					new THREE.Vector2(0, 0.333),
-				];
-				var wood = [
-					new THREE.Vector2(0.5, 0),
-					new THREE.Vector2(1, 0),
-					new THREE.Vector2(1, 0.333),
-					new THREE.Vector2(0.5, 0.333),
-				];
+      var material = new THREE.MeshPhongMaterial({
+        map: loader.load("./texture-atlas.jpg"),
+      });
 
-				geometry.faceVertexUvs = [];
-				geometry.faceVertexUvs[0] = [];
+      var bricks = [
+        new THREE.Vector2(0, 0.666),
+        new THREE.Vector2(0.5, 0.666),
+        new THREE.Vector2(0.5, 1),
+        new THREE.Vector2(0, 1),
+      ];
+      var clouds = [
+        new THREE.Vector2(0.5, 0.666),
+        new THREE.Vector2(1, 0.666),
+        new THREE.Vector2(1, 1),
+        new THREE.Vector2(0.5, 1),
+      ];
+      var crate = [
+        new THREE.Vector2(0, 0.333),
+        new THREE.Vector2(0.5, 0.333),
+        new THREE.Vector2(0.5, 0.666),
+        new THREE.Vector2(0, 0.666),
+      ];
+      var stone = [
+        new THREE.Vector2(0.5, 0.333),
+        new THREE.Vector2(1, 0.333),
+        new THREE.Vector2(1, 0.666),
+        new THREE.Vector2(0.5, 0.666),
+      ];
+      var water = [
+        new THREE.Vector2(0, 0),
+        new THREE.Vector2(0.5, 0),
+        new THREE.Vector2(0.5, 0.333),
+        new THREE.Vector2(0, 0.333),
+      ];
+      var wood = [
+        new THREE.Vector2(0.5, 0),
+        new THREE.Vector2(1, 0),
+        new THREE.Vector2(1, 0.333),
+        new THREE.Vector2(0.5, 0.333),
+      ];
 
-				geometry.faceVertexUvs[0][0] = [bricks[0], bricks[1], bricks[3]];
-				geometry.faceVertexUvs[0][1] = [bricks[1], bricks[2], bricks[3]];
+      geometry.faceVertexUvs = [];
+      geometry.faceVertexUvs[0] = [];
 
-				geometry.faceVertexUvs[0][2] = [clouds[0], clouds[1], clouds[3]];
-				geometry.faceVertexUvs[0][3] = [clouds[1], clouds[2], clouds[3]];
+      geometry.faceVertexUvs[0][0] = [bricks[0], bricks[1], bricks[3]];
+      geometry.faceVertexUvs[0][1] = [bricks[1], bricks[2], bricks[3]];
 
-				geometry.faceVertexUvs[0][4] = [crate[0], crate[1], crate[3]];
-				geometry.faceVertexUvs[0][5] = [crate[1], crate[2], crate[3]];
+      geometry.faceVertexUvs[0][2] = [clouds[0], clouds[1], clouds[3]];
+      geometry.faceVertexUvs[0][3] = [clouds[1], clouds[2], clouds[3]];
 
-				geometry.faceVertexUvs[0][6] = [stone[0], stone[1], stone[3]];
-				geometry.faceVertexUvs[0][7] = [stone[1], stone[2], stone[3]];
+      geometry.faceVertexUvs[0][4] = [crate[0], crate[1], crate[3]];
+      geometry.faceVertexUvs[0][5] = [crate[1], crate[2], crate[3]];
 
-				geometry.faceVertexUvs[0][8] = [water[0], water[1], water[3]];
-				geometry.faceVertexUvs[0][9] = [water[1], water[2], water[3]];
+      geometry.faceVertexUvs[0][6] = [stone[0], stone[1], stone[3]];
+      geometry.faceVertexUvs[0][7] = [stone[1], stone[2], stone[3]];
 
-				geometry.faceVertexUvs[0][10] = [wood[0], wood[1], wood[3]];
-				geometry.faceVertexUvs[0][11] = [wood[1], wood[2], wood[3]];
+      geometry.faceVertexUvs[0][8] = [water[0], water[1], water[3]];
+      geometry.faceVertexUvs[0][9] = [water[1], water[2], water[3]];
 
-				mesh = new THREE.Mesh(geometry, material);
-				mesh.position.z = -50;
-				scene.add(mesh);
+      geometry.faceVertexUvs[0][10] = [wood[0], wood[1], wood[3]];
+      geometry.faceVertexUvs[0][11] = [wood[1], wood[2], wood[3]];
 
-				renderer = new THREE.WebGLRenderer();
-				renderer.setSize(window.innerWidth, window.innerHeight);
-				document.body.appendChild(renderer.domElement);
+      mesh = new THREE.Mesh(geometry, material);
+      mesh.position.z = -50;
+      scene.add(mesh);
 
-				window.addEventListener("resize", onWindowResize, false);
+      renderer = new THREE.WebGLRenderer();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      document.body.appendChild(renderer.domElement);
 
-				render();
-			}
+      window.addEventListener("resize", onWindowResize, false);
 
-			function animate() {
-				mesh.rotation.x += 0.005;
-				mesh.rotation.y += 0.002;
+      render();
+    }
 
-				render();
-				requestAnimationFrame(animate);
-			}
+    function animate() {
+      mesh.rotation.x += 0.005;
+      mesh.rotation.y += 0.002;
 
-			function render() {
-				renderer.render(scene, camera);
-			}
+      render();
+      requestAnimationFrame(animate);
+    }
 
-			function onWindowResize() {
-				camera.aspect = window.innerWidth / window.innerHeight;
-				camera.updateProjectionMatrix();
-				renderer.setSize(window.innerWidth, window.innerHeight);
-				render();
-			}
-		</script>
-	</body>
+    function render() {
+      renderer.render(scene, camera);
+    }
+
+    function onWindowResize() {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      render();
+    }
+  </script>
+</body>
+
 </html>

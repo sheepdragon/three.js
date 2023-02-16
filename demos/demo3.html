@@ -1,216 +1,220 @@
 <!DOCTYPE html>
 <html lang="en">
-	<head>
-		<title>demo</title>
-		<meta charset="utf-8" />
-		<meta
-			name="viewport"
-			content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"
-		/>
-		<link type="text/css" rel="stylesheet" href="/examples/main.css" />
-		<style>
-			a {
-				color: blue;
-			}
-			.control-inactive button {
-				color: #888;
-			}
-			#control {
-				position: absolute;
-				top: 10px;
-				right: 10px;
-				z-index: 100;
-			}
-		</style>
-	</head>
-	<body>
-		<div id="container"></div>
-		<button id="control">开始</button>
-		<!-- Import maps polyfill -->
-		<!-- Remove this when import maps will be widely supported -->
-		<script
-			async
-			src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"
-		></script>
 
-		<script type="importmap">
-			{
-				"imports": {
-					"three": "../build/three.module.js",
-					"three/addons/": "/examples/jsm/"
-				}
-			}
-		</script>
+<head>
+  <title>demo</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
+  <link type="text/css" rel="stylesheet" href="/examples/main.css" />
+  <style>
+    a {
+      color: blue;
+    }
 
-		<script type="module">
-			import * as THREE from "three";
+    .control-inactive button {
+      color: #888;
+    }
 
-			import Stats from "three/addons/libs/stats.module.js";
-			import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+    #control {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      z-index: 100;
+    }
+  </style>
+</head>
 
-			let scene, renderer, camera, stats, clock;
-			let controls, mesh, group, spriteGroup;
-			let speed = 0.2;
+<body>
+  <div id="container"></div>
+  <button id="control">开始</button>
+  <!-- Import maps polyfill -->
+  <!-- Remove this when import maps will be widely supported -->
+  <script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
 
-			const aspect = window.innerWidth / window.innerHeight;
+  <script type="importmap">
+      {
+        "imports": {
+          "three": "../build/three.module.js",
+          "three/addons/": "/examples/jsm/"
+        }
+      }
+    </script>
 
-			const headImgArr = [
-				"./heads/1.png",
-				"./heads/2.png",
-				"./heads/3.png",
-				"./heads/4.png",
-				"./heads/5.png",
-				"./heads/6.png",
-				"./heads/7.png",
-				"./heads/8.png",
-				"./heads/9.png",
-				"./heads/10.png",
-				"./heads/11.png",
-				"./heads/12.png",
-				"./heads/13.png",
-			];
+  <script type="module">
+    import * as THREE from "three";
 
-			init();
-			animate();
+    import Stats from "three/addons/libs/stats.module.js";
+    import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 
-			function init() {
-				clock = new THREE.Clock();
-				const container = document.getElementById("container");
+    let scene, renderer, camera, stats, clock;
+    let controls, mesh, group, spriteGroup;
+    let speed = 0.2;
 
-				stats = new Stats();
-				container.appendChild(stats.dom);
+    const aspect = window.innerWidth / window.innerHeight;
 
-				// renderer
-				renderer = new THREE.WebGLRenderer({ antialias: true });
-				renderer.setPixelRatio(window.devicePixelRatio);
-				renderer.setSize(window.innerWidth, window.innerHeight);
-				container.appendChild(renderer.domElement);
+    const headImgArr = [
+      "./heads/1.png",
+      "./heads/2.png",
+      "./heads/3.png",
+      "./heads/4.png",
+      "./heads/5.png",
+      "./heads/6.png",
+      "./heads/7.png",
+      "./heads/8.png",
+      "./heads/9.png",
+      "./heads/10.png",
+      "./heads/11.png",
+      "./heads/12.png",
+      "./heads/13.png",
+    ];
 
-				scene = new THREE.Scene();
-				scene.background = new THREE.Color(0x000000);
-				scene.fog = new THREE.Fog(0xa0a0a0, 300, 900);
-				scene.add(new THREE.AxesHelper(300));
+    init();
+    animate();
 
-				// camera
-				camera = new THREE.PerspectiveCamera(40, aspect, 1, 2000);
-				camera.position.set(150, 170, 400);
-				window.camera = camera;
+    function init() {
+      clock = new THREE.Clock();
+      const container = document.getElementById("container");
 
-				// controls
-				controls = new OrbitControls(camera, renderer.domElement);
-				controls.target.set(0, 1, 0);
-				controls.update();
-				controls.enablePan = true;
-				controls.enableZoom = true;
-				controls.enableDamping = true;
+      stats = new Stats();
+      container.appendChild(stats.dom);
 
-				const textureLoader = new THREE.TextureLoader();
+      // renderer
+      renderer = new THREE.WebGLRenderer({ antialias: true });
+      renderer.setPixelRatio(window.devicePixelRatio);
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      container.appendChild(renderer.domElement);
 
-				group = new THREE.Group();
-				spriteGroup = new THREE.Group();
+      scene = new THREE.Scene();
+      scene.background = new THREE.Color(0x000000);
+      scene.fog = new THREE.Fog(0xa0a0a0, 300, 900);
+      scene.add(new THREE.AxesHelper(300));
 
-				// 设置精灵对象
-				// sphere
-				const vector = new THREE.Vector3();
-				for (let i = 0, l = 300; i < l; i++) {
-					const phi = Math.acos(-1 + (2 * i) / l);
-					const theta = Math.sqrt(l * Math.PI) * phi;
-					const object = new THREE.Object3D();
-					object.position.setFromSphericalCoords(150, phi, theta);
-					vector.copy(object.position).multiplyScalar(2);
-					object.lookAt(vector);
-					////////////////////////////////////////
-					const imgUrl = headImgArr[(Math.random() * headImgArr.length) | 0];
+      // camera
+      camera = new THREE.PerspectiveCamera(40, aspect, 1, 2000);
+      camera.position.set(150, 170, 400);
+      window.camera = camera;
 
-					let texture
-					const textureType = 'circle' // text, img, circle
-					switch (textureType) {
-						case 'text':
-							// 文字
-							let fontSize = 12;
-							let canvas = document.createElement("canvas");
-							let ctx = canvas.getContext("2d");
-							ctx.font = fontSize + "px Arial";
-							canvas.width = ctx.measureText(i).width;
-							canvas.height = fontSize * 2;
-							ctx.font = fontSize + "px Arial";
-							ctx.fillStyle = "rgba(255,255,255,1)";
-							ctx.fillText(i, 0, fontSize);
+      // controls
+      controls = new OrbitControls(camera, renderer.domElement);
+      controls.target.set(0, 1, 0);
+      controls.update();
+      controls.enablePan = true;
+      controls.enableZoom = true;
+      controls.enableDamping = true;
 
-							texture = new THREE.Texture(canvas);
-							texture.minFilter = THREE.LinearFilter;
-							texture.needsUpdate = true;
-							break;
-						case 'circle':
-							// 图片加载
-							const img = document.createElement("img");
-							img.crossOrigin = "anonymous";
-							img.src = imgUrl;
-							img.onload = function () {
-								const { width, height } = img;
-								const canvas = document.createElement("canvas");
-								canvas.width = width;
-								canvas.height = height;
-								const ctx = canvas.getContext("2d");
-								ctx.save();
-								ctx.beginPath();
-								ctx.arc(width / 2, height / 2, width / 2, 0, Math.PI * 2, false);
-								ctx.clip();
-								ctx.drawImage(img, 0, 0, width, height);
-								ctx.restore();
+      const textureLoader = new THREE.TextureLoader();
 
-								texture = new THREE.CanvasTexture(canvas);
-								material.map = texture;
-								material.needsUpdate = true;
-							};
-							break;
-						default:
-							texture = textureLoader.load(imgUrl);
-							break;
-					}
+      group = new THREE.Group();
+      spriteGroup = new THREE.Group();
 
-					const material = new THREE.SpriteMaterial({map: texture});
-					const sprite = new THREE.Sprite(material);
-					sprite.position.copy(object.position);
-					sprite.scale.set(10, 10, 1);
+      // 设置精灵对象
+      // sphere
+      const vector = new THREE.Vector3();
+      for (let i = 0, l = 300; i < l; i++) {
+        const phi = Math.acos(-1 + (2 * i) / l);
+        const theta = Math.sqrt(l * Math.PI) * phi;
+        const object = new THREE.Object3D();
+        object.position.setFromSphericalCoords(150, phi, theta);
+        vector.copy(object.position).multiplyScalar(2);
+        object.lookAt(vector);
+        ////////////////////////////////////////
+        const imgUrl = headImgArr[(Math.random() * headImgArr.length) | 0];
 
-					spriteGroup.add(sprite);
-				}
-				group.add(spriteGroup);
-				scene.add(group);
+        let texture
+        const textureType = '' // text, img, circle
+        let alphaMap
+        switch (textureType) {
+          case 'text':
+            // 文字
+            let fontSize = 12;
+            let canvas = document.createElement("canvas");
+            let ctx = canvas.getContext("2d");
+            ctx.font = fontSize + "px Arial";
+            canvas.width = ctx.measureText(i).width;
+            canvas.height = fontSize * 2;
+            ctx.font = fontSize + "px Arial";
+            ctx.fillStyle = "rgba(255,255,255,1)";
+            ctx.fillText(i, 0, fontSize);
 
-				group.rotation.z = -Math.PI / 5;
-			}
+            texture = new THREE.Texture(canvas);
+            texture.minFilter = THREE.LinearFilter;
+            texture.needsUpdate = true;
+            break;
+          case 'circle':
+            // 图片加载
+            const img = document.createElement("img");
+            img.crossOrigin = "anonymous";
+            img.src = imgUrl;
+            img.onload = function () {
+              const { width, height } = img;
+              const canvas = document.createElement("canvas");
+              canvas.width = width;
+              canvas.height = height;
+              const ctx = canvas.getContext("2d");
+              ctx.save();
+              ctx.beginPath();
+              ctx.arc(width / 2, height / 2, width / 2, 0, Math.PI * 2, false);
+              ctx.clip();
+              ctx.drawImage(img, 0, 0, width, height);
+              ctx.restore();
 
-			window.onresize = function onWindowResize() {
-				camera.aspect = window.innerWidth / window.innerHeight;
-				camera.updateProjectionMatrix();
-				renderer.setSize(window.innerWidth, window.innerHeight);
-			};
+              texture = new THREE.CanvasTexture(canvas);
+              material.map = texture;
+              material.needsUpdate = true;
+            };
+            break;
+          default:
+            texture = textureLoader.load(imgUrl);
+            alphaMap = textureLoader.load('./xxx.png')
+            break;
+        }
 
-			function animate() {
-				requestAnimationFrame(animate);
+        const material = new THREE.SpriteMaterial(Object.assign(
+          { map: texture },
+          alphaMap ? { alphaMap, transparent: true, alphaTest: 0 } : {}
+        ));
+        const sprite = new THREE.Sprite(material);
+        sprite.position.copy(object.position);
+        sprite.scale.set(15, 15, 1);
 
-				const time = Date.now() * 0.001 * speed;
-				spriteGroup.rotation.y = time;
+        spriteGroup.add(sprite);
+      }
+      group.add(spriteGroup);
+      scene.add(group);
 
-				controls.update();
-				stats.update();
-				renderer.render(scene, camera);
-			}
+      group.rotation.z = -Math.PI / 5;
+    }
 
-			document.querySelector("#control").addEventListener("click", (e) => {
-				const v = e.target.innerText;
-				if (v === "开始") {
-					e.target.innerText = "暂停";
-					speed = 5;
-					group.rotation.z = Math.PI / 5;
-				} else {
-					e.target.innerText = "开始";
-					speed = 0.2;
-					group.rotation.z = -Math.PI / 5;
-				}
-			});
-		</script>
-	</body>
+    window.onresize = function onWindowResize() {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    };
+
+    function animate() {
+      requestAnimationFrame(animate);
+
+      const time = Date.now() * 0.001 * speed;
+      spriteGroup.rotation.y = time;
+
+      controls.update();
+      stats.update();
+      renderer.render(scene, camera);
+    }
+
+    document.querySelector("#control").addEventListener("click", (e) => {
+      const v = e.target.innerText;
+      if (v === "开始") {
+        e.target.innerText = "暂停";
+        speed = 5;
+        group.rotation.z = Math.PI / 5;
+      } else {
+        e.target.innerText = "开始";
+        speed = 0.2;
+        group.rotation.z = -Math.PI / 5;
+      }
+    });
+  </script>
+</body>
+
 </html>
